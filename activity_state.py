@@ -32,6 +32,16 @@ class ActivitySession:
         }
 
 
+def _deep_merge(base: dict, update: dict) -> dict:
+    result = base.copy()
+    for key, value in update.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
 class ActivityState:
     """In-memory state store for Activity sessions.
     
@@ -79,11 +89,10 @@ class ActivityState:
         if self._session is None:
             return None
         
-        self._session.payload = payload
+        self._session.payload = _deep_merge(self._session.payload, payload)
         self._session.updated_at = time.time()
-        
-        if "meta" in payload:
-            payload["meta"]["updated_at"] = self._session.updated_at
+        self._session.payload.setdefault("meta", {})
+        self._session.payload["meta"]["updated_at"] = self._session.updated_at
         
         return self._session
     

@@ -16,12 +16,13 @@ Routes:
 import json
 import logging
 import sys
+import asyncio
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -128,10 +129,12 @@ async def get_state(session_id: str):
             }
         )
     
-    return JSONResponse(content={
+    response = JSONResponse(content={
         "active": True,
         "session": current.to_dict(),
     })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.get("/state")
@@ -144,12 +147,16 @@ async def get_current_state():
     current = activity_state.get_session()
     
     if current is None:
-        return JSONResponse(content={"active": False, "message": "No active session"})
-    
-    return JSONResponse(content={
+        response = JSONResponse(content={"active": False, "message": "No active session"})
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    response = JSONResponse(content={
         "active": True,
         "session": current.to_dict(),
     })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.post("/launch")
@@ -167,9 +174,12 @@ async def api_launch(request: LaunchRequest):
     )
     
     if not result.get("success"):
-        return JSONResponse(status_code=400, content=result)
-    
-    return JSONResponse(content=result)
+        response = JSONResponse(status_code=400, content=result)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    response = JSONResponse(content=result)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.post("/close")
@@ -178,8 +188,9 @@ async def api_close(request: CloseRequest):
     activity_bridge = _get_activity_bridge()
     
     result = activity_bridge.close(session_id=request.session_id)
-    
-    return JSONResponse(content=result)
+    response = JSONResponse(content=result)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.post("/event")
@@ -221,11 +232,13 @@ async def receive_event(request: EventRequest):
             "timestamp": time.time(),
         }
     
-    return JSONResponse(content={
+    response = JSONResponse(content={
         "success": True,
         "session_id": request.session_id,
         "event_type": request.event_type,
     })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @router.get("/capabilities")
@@ -234,10 +247,60 @@ async def api_capabilities():
     activity_bridge = _get_activity_bridge()
     
     result = activity_bridge.capabilities(platform="discord")
-    return JSONResponse(content=result)
+    response = JSONResponse(content=result)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+@router.post("/update")
+async def api_update(request: UpdateRequest):
+    """Update an existing Activity session's payload."""
+    activity_bridge = _get_activity_bridge()
+    result = activity_bridge.update(session_id=request.session_id, payload=request.payload)
+    response = JSONResponse(content=result)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+@router.get("/stream")
+async def stream_state():
+    """Server-Sent Events stream of Activity state changes."""
+    activity_state = _get_activity_state()
+
+    async def event_generator():
+        last_dict = None
+        while True:
+            current = activity_state.get_session()
+            data = current.to_dict() if current else {"active": False}
+            if data != last_dict:
+                last_dict = data
+                yield f"data: {json.dumps(data, default=str)}\n\n"
+            await asyncio.sleep(1)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Access-Control-Allow-Origin": "*",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.options("/{path:path}")
+async def cors_options(path: str):
+    from fastapi import Response
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
 
 
 @router.get("/health")
 async def health():
     """Health check endpoint."""
-    return JSONResponse(content={"status": "ok", "plugin": "discord-activities"})
+    response = JSONResponse(content={"status": "ok", "plugin": "discord-activities"})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response

@@ -140,34 +140,84 @@ export async function healthCheck(): Promise<{ status: string; plugin: string }>
 }
 
 /**
- * Start polling for state updates
- * Returns a cleanup function to stop polling
+ * Start Server-Sent Events stream for state updates.
+ * Falls back to polling if SSE is unavailable.
+ * Returns a cleanup function.
+ */
+export function startStateStream(
+  sessionId: string | undefined,
+  onUpdate: (state: ActivityState) => void,
+  onError?: (err: Error) => void
+): () => void {
+  // Try SSE first
+  const streamUrl = `${getBaseUrl()}/stream`;
+  let source: EventSource | null = null;
+  let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+  let active = true;
+
+  const usePolling = () => {
+    console.log('SSE unavailable, falling back to polling');
+    const poll = async () => {
+      if (!active) return;
+      try {
+        const state = await fetchState(sessionId);
+        onUpdate(state);
+      } catch (error) {
+        console.error('Polling error:', error);
+        if (onError) onError(error instanceof Error ? error : new Error(String(error)));
+      }
+      if (active) {
+        fallbackTimer = setTimeout(poll, 2000);
+      }
+    };
+    poll();
+  };
+
+  try {
+    source = new EventSource(streamUrl);
+
+    source.onmessage = (event) => {
+      try {
+        const state = JSON.parse(event.data);
+        onUpdate(state);
+      } catch (err) {
+        console.error('SSE parse error:', err);
+      }
+    };
+
+    source.onerror = (err) => {
+      console.error('SSE error:', err);
+      if (source) {
+        source.close();
+        source = null;
+      }
+      usePolling();
+    };
+  } catch (err) {
+    console.error('Failed to create EventSource:', err);
+    usePolling();
+  }
+
+  return () => {
+    active = false;
+    if (source) {
+      source.close();
+      source = null;
+    }
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer);
+    }
+  };
+}
+
+/**
+ * Legacy: Start polling for state updates.
+ * Prefer startStateStream for live updates.
  */
 export function startStatePolling(
   sessionId: string | undefined,
   onUpdate: (state: ActivityState) => void,
   intervalMs: number = 2000
 ): () => void {
-  let active = true;
-
-  const poll = async () => {
-    if (!active) return;
-
-    try {
-      const state = await fetchState(sessionId);
-      onUpdate(state);
-    } catch (error) {
-      console.error('Polling error:', error);
-    }
-
-    if (active) {
-      setTimeout(poll, intervalMs);
-    }
-  };
-
-  poll();
-
-  return () => {
-    active = false;
-  };
+  return startStateStream(sessionId, onUpdate);
 }

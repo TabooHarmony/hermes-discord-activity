@@ -11,7 +11,7 @@ import type {
   ActivityAction,
 } from './types';
 import type { DiscordContext } from './discord';
-import { fetchState, postEvent, startStatePolling } from './api';
+import { fetchState, postEvent, startStateStream } from './api';
 
 interface AppProps {
   sessionId?: string;
@@ -33,13 +33,15 @@ export function App({ sessionId: initialSessionId, discordContext }: AppProps) {
         setState(initialState);
         setLoading(false);
 
-        // Start polling for updates
-        cleanup = startStatePolling(
+        // Start SSE stream for live updates (falls back to polling)
+        cleanup = startStateStream(
           initialState.session?.session_id,
           (newState) => {
             setState(newState);
           },
-          2000
+          (err) => {
+            console.error('State stream error:', err);
+          }
         );
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load state');
