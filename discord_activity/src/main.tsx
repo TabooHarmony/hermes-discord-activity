@@ -18,8 +18,8 @@ import {
 import './styles.css';
 
 // Discord Application Client ID
-// This should be configured per-deployment
-const DISCORD_CLIENT_ID = import.meta.env?.VITE_DISCORD_CLIENT_ID || '';
+// Uses the existing Hermes gateway bot application
+const DISCORD_CLIENT_ID = '1493056841783971840';
 
 // Get session ID from URL params or use undefined
 function getSessionIdFromUrl(): string | undefined {

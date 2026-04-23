@@ -16,7 +16,7 @@ import type {
 // Configurable via window.HERMES_URL or URL parameter
 // In Discord Activity context, this should be the Hermes server URL
 const getBaseUrl = (): string => {
-  // Priority: window global > URL param > default
+  // Priority: window global > URL param > hardcoded production URL
   const windowUrl = (window as { HERMES_URL?: string }).HERMES_URL;
   if (windowUrl) return `${windowUrl}/api/plugins/discord-activities`;
 
@@ -24,9 +24,8 @@ const getBaseUrl = (): string => {
   const urlParam = params.get('hermes_url');
   if (urlParam) return `${urlParam}/api/plugins/discord-activities`;
 
-  // Default: same origin (works when served by Hermes or with proxy)
-  const origin = window.location.origin;
-  return `${origin}/api/plugins/discord-activities`;
+  // Production default: the tunneled Hermes API
+  return 'https://hermes.sys64.com/api/plugins/discord-activities';
 };
 
 /**
