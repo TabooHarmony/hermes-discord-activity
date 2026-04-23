@@ -1,0 +1,11 @@
+name: discord-activities
+version: "0.1.0"
+description: Discord Activity as a live visual surface for Hermes
+author: Hermes
+requires_env: []
+provides_tools:
+  - launch_activity
+  - update_activity_state
+  - close_activity
+  - activity_capabilities
+provides_hooks: []

@@ -1,0 +1,420 @@
+/**
+ * Activity Shell Styles
+ *
+ * Basic styling for the Activity shell components.
+ */
+
+/* Reset and base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #dcddde;
+  background-color: #202225;
+}
+
+/* Activity shell container */
+.activity-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+/* Loading state */
+.activity-shell.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.activity-shell.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-message {
+  text-align: center;
+  color: #f44336;
+}
+
+.error-message h2 {
+  margin-bottom: 8px;
+}
+
+/* Empty state */
+.activity-shell.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  color: #72767d;
+}
+
+.empty-state h2 {
+  margin-bottom: 8px;
+}
+
+/* Header */
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #36393f;
+}
+
+.activity-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  flex: 1;
+}
+
+.activity-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #5865f2;
+  color: #ffffff;
+}
+
+.activity-status.idle {
+  background-color: #747f8d;
+}
+
+.activity-mode {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #2f3136;
+  color: #b9bbbe;
+}
+
+.discord-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #5865f2;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.discord-indicator {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.discord-indicator small {
+  color: #5865f2;
+}
+
+.discord-hint {
+  margin-top: 8px;
+  color: #72767d;
+}
+
+/* Content area */
+.activity-content {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Actions footer */
+.activity-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #36393f;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-btn.primary {
+  background-color: #5865f2;
+  color: #ffffff;
+}
+
+.action-btn.primary:hover:not(.disabled) {
+  background-color: #4752c4;
+}
+
+.action-btn.secondary {
+  background-color: #2f3136;
+  color: #b9bbbe;
+}
+
+.action-btn.secondary:hover:not(.disabled) {
+  background-color: #36393f;
+}
+
+.action-btn.danger {
+  background-color: #ed4245;
+  color: #ffffff;
+}
+
+.action-btn.danger:hover:not(.disabled) {
+  background-color: #c03537;
+}
+
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Meta info */
+.activity-meta {
+  margin-top: 12px;
+  text-align: right;
+  color: #72767d;
+  font-size: 11px;
+}
+
+/* Dashboard mode */
+.mode-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-content {
+  padding: 12px;
+  background-color: #2f3136;
+  border-radius: 8px;
+}
+
+.dashboard-section {
+  padding: 12px;
+  background-color: #2f3136;
+  border-radius: 8px;
+}
+
+.dashboard-section h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.section-status {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+.section-status.active {
+  background-color: #3ba55c;
+  color: #ffffff;
+}
+
+.section-status.idle {
+  background-color: #747f8d;
+  color: #ffffff;
+}
+
+.dashboard-card {
+  padding: 12px;
+  background-color: #2f3136;
+  border-radius: 8px;
+}
+
+.dashboard-card h4 {
+  font-size: 12px;
+  color: #72767d;
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.card-status {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.dashboard-empty {
+  padding: 32px;
+  text-align: center;
+  color: #72767d;
+}
+
+/* Embed mode */
+.mode-embed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-embed.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #72767d;
+}
+
+.embed-frame {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  background-color: #2f3136;
+}
+
+/* Live-view mode */
+.mode-live-view {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+}
+
+.live-frame {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2f3136;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.live-frame img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.no-frame {
+  color: #72767d;
+  text-align: center;
+}
+
+.live-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+}
+
+.live-objective,
+.live-last-action,
+.live-state,
+.live-recent-actions {
+  padding: 12px;
+  background-color: #2f3136;
+  border-radius: 8px;
+}
+
+.live-sidebar h4 {
+  font-size: 12px;
+  color: #72767d;
+  margin-bottom: 4px;
+}
+
+.live-sidebar p,
+.live-sidebar pre {
+  font-size: 13px;
+  color: #dcddde;
+}
+
+.live-sidebar pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.live-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.live-sidebar li {
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #36393f;
+}
+
+.live-sidebar li:last-child {
+  border-bottom: none;
+}
+
+/* Assistant mode */
+.mode-assistant {
+  padding: 16px;
+}
+
+.assistant-content {
+  line-height: 1.6;
+}
+
+.assistant-empty {
+  padding: 32px;
+  text-align: center;
+  color: #72767d;
+}
+
+/* Artifacts mode */
+.mode-artifacts {
+  padding: 16px;
+}
+
+.artifacts-content pre {
+  font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.artifacts-empty {
+  padding: 32px;
+  text-align: center;
+  color: #72767d;
+}
+
+/* Unknown mode */
+.unknown-mode {
+  padding: 32px;
+  text-align: center;
+  color: #f44336;
+}

@@ -1,0 +1,8 @@
+{
+  "name": "discord-activities",
+  "version": "0.1.0",
+  "description": "Discord Activity plugin - provides HTTP API for Activity frontend communication. Frontend lives in discord_activity/ and is built separately for Discord, not Hermes dashboard.",
+  "api": "plugin_api.py",
+  "entry": null,
+  "assets": []
+}
