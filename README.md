@@ -1,6 +1,6 @@
 # Hermes Discord Activity Plugin
 
-A [Hermes Agent](https://github.com/TabooHarmony/hermes-agent) plugin that turns Discord Activities into live visual surfaces for AI-generated output.
+A [Hermes Agent](https://github.com/TabooHarmony/hermes-agent) plugin that turns Discord Activities into live visual surfaces for generated output.
 
 ## What it does
 
